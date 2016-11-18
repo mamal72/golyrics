@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+func shouldNotPanic(test *testing.T) {
+	if r := recover(); r != nil {
+		test.Errorf("stripeHTMLTags() paniced")
+	}
+}
+
 func Test_breakToNewLine(t *testing.T) {
 	type args struct {
 		HTML string
@@ -61,6 +67,7 @@ func Test_stripeHTMLTags(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		defer shouldNotPanic(t)
 		if got := stripeHTMLTags(tt.args.HTML); got != tt.want {
 			t.Errorf("%q. stripeHTMLTags() = %v, want %v", tt.name, got, tt.want)
 		}
@@ -136,6 +143,7 @@ func TestSearchLyrics(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		defer shouldNotPanic(t)
 		if got := SearchLyrics(tt.args.query); !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("%q. SearchLyrics() = %v, want %v", tt.name, got, tt.want)
 		}
@@ -188,6 +196,7 @@ func TestGetLyrics(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		defer shouldNotPanic(t)
 		if got := GetLyrics(tt.args.title); got != tt.want {
 			t.Errorf("%q. GetLyrics() = %v, want %v", tt.name, got, tt.want)
 		}
