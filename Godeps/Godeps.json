@@ -1,0 +1,28 @@
+{
+	"ImportPath": "github.com/mamal72/golyrics",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v75",
+	"Deps": [
+		{
+			"ImportPath": "github.com/PuerkitoBio/goquery",
+			"Comment": "v1.0.1-2-g152b1a2",
+			"Rev": "152b1a2c8f5d0340f658bb656032a39b94e52958"
+		},
+		{
+			"ImportPath": "github.com/andybalholm/cascadia",
+			"Rev": "65919c611220063037b1db8eb334acaf17a6d8ea"
+		},
+		{
+			"ImportPath": "github.com/buger/jsonparser",
+			"Rev": "f04e003e4115787c6272636780bc206e5ffad6c4"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "4971afdc2f162e82d185353533d3cf16188a9f4e"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html/atom",
+			"Rev": "4971afdc2f162e82d185353533d3cf16188a9f4e"
+		}
+	]
+}
