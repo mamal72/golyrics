@@ -5,12 +5,6 @@ import (
 	"testing"
 )
 
-func shouldNotPanic(test *testing.T) {
-	if r := recover(); r != nil {
-		test.Errorf("stripeHTMLTags() paniced")
-	}
-}
-
 func Test_breakToNewLine(t *testing.T) {
 	type args struct {
 		HTML string
@@ -54,27 +48,33 @@ func Test_stripeHTMLTags(t *testing.T) {
 		HTML string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
 		{
 			name: "test should work for different kinds of HTML tags",
 			args: args{
 				"<p>Hello World<br/>This is a TEST! :D</p>",
 			},
-			want: "Hello WorldThis is a TEST! :D",
+			want:    "Hello WorldThis is a TEST! :D",
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
-		defer shouldNotPanic(t)
-		if got := stripeHTMLTags(tt.args.HTML); got != tt.want {
+		got, err := stripeHTMLTags(tt.args.HTML)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. stripeHTMLTags() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if got != tt.want {
 			t.Errorf("%q. stripeHTMLTags() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func Test_getFormattedLyrics(t *testing.T) {
+func Test_fixApostrophes(t *testing.T) {
 	type args struct {
 		text string
 	}
@@ -84,16 +84,16 @@ func Test_getFormattedLyrics(t *testing.T) {
 		want string
 	}{
 		{
-			name: "test should return a correct formatted string from HTML lyrics",
+			name: "test should work for apostrophes in the strings",
 			args: args{
-				"<div class='lyricbox'>The shortest song in the universe<br/>Really isn't much fun<br/>It only has one puny verse<br/>. . . and then it's done!<div class='lyricsbreak'></div>\n</div>",
+				"I&#39;m not strong enough to stay away\nCan&#39;t run from you...",
 			},
-			want: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			want: "I'm not strong enough to stay away\nCan't run from you...",
 		},
 	}
 	for _, tt := range tests {
-		if got := getFormattedLyrics(tt.args.text); got != tt.want {
-			t.Errorf("%q. getFormattedLyrics() = %v, want %v", tt.name, got, tt.want)
+		if got := fixApostrophes(tt.args.text); got != tt.want {
+			t.Errorf("%q. fixApostrophes() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
@@ -122,14 +122,46 @@ func Test_getSearchURI(t *testing.T) {
 	}
 }
 
+func Test_getFormattedLyrics(t *testing.T) {
+	type args struct {
+		text string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "test should return a correct formatted string from HTML lyrics",
+			args: args{
+				"<div class='lyricbox'>The shortest song in the universe<br/>Really isn't much fun<br/>It only has one puny verse<br/>. . . and then it's done!<div class='lyricsbreak'></div>\n</div>",
+			},
+			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		got, err := getFormattedLyrics(tt.args.text)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. getFormattedLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if got != tt.want {
+			t.Errorf("%q. getFormattedLyrics() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
+
 func TestSearchLyrics(t *testing.T) {
 	type args struct {
 		query string
 	}
 	tests := []struct {
-		name string
-		args args
-		want []string
+		name    string
+		args    args
+		want    []string
+		wantErr bool
 	}{
 		{
 			name: "test should return some results for some famous tracks",
@@ -140,11 +172,24 @@ func TestSearchLyrics(t *testing.T) {
 				"Metallica:Unforgiven",
 				"Metallica:The Unforgiven II",
 			},
+			wantErr: false,
+		},
+		{
+			name: "test should return no results for wrong input query",
+			args: args{
+				"sadasdasfdsfkdsjfgkrjferjkgnf,gfdngirjdgfmv",
+			},
+			want:    []string{},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
-		defer shouldNotPanic(t)
-		if got := SearchLyrics(tt.args.query); !reflect.DeepEqual(got, tt.want) {
+		got, err := SearchLyrics(tt.args.query)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. SearchLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("%q. SearchLyrics() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
@@ -156,9 +201,10 @@ func TestSearchLyricsByArtistAndName(t *testing.T) {
 		name   string
 	}
 	tests := []struct {
-		name string
-		args args
-		want []string
+		name    string
+		args    args
+		want    []string
+		wantErr bool
 	}{
 		{
 			name: "test should return some results for some good real tracks",
@@ -169,10 +215,25 @@ func TestSearchLyricsByArtistAndName(t *testing.T) {
 			want: []string{
 				"Blackfield:End Of The World",
 			},
+			wantErr: false,
+		},
+		{
+			name: "test should return no results for unreal tracks",
+			args: args{
+				"sakfjweirufuxjn4hrfnmdxnjvdsfsdjhfhjsdfs",
+				"askjdjkasdjksdjlfjsdkufslidfjlksdjklfjklsdfjklsdfs",
+			},
+			want:    []string{},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
-		if got := SearchLyricsByArtistAndName(tt.args.artist, tt.args.name); !reflect.DeepEqual(got, tt.want) {
+		got, err := SearchLyricsByArtistAndName(tt.args.artist, tt.args.name)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. SearchLyricsByArtistAndName() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("%q. SearchLyricsByArtistAndName() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
@@ -183,21 +244,27 @@ func TestGetLyrics(t *testing.T) {
 		title string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
 		{
 			name: "test should return right lyrics for a real track",
 			args: args{
 				"Sandra_Boynton:The_Shortest_Song_In_The_Universe",
 			},
-			want: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
-		defer shouldNotPanic(t)
-		if got := GetLyrics(tt.args.title); got != tt.want {
+		got, err := GetLyrics(tt.args.title)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. GetLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if got != tt.want {
 			t.Errorf("%q. GetLyrics() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
@@ -208,20 +275,35 @@ func TestSearchAndGetLyrics(t *testing.T) {
 		query string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
 		{
-			name: "test should return right lyrics for a real track",
+			name: "test should search and return right lyrics for a real track",
 			args: args{
 				"Sandra_Boynton:The_Shortest_Song_In_The_Universe",
 			},
-			want: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			wantErr: false,
+		},
+		{
+			name: "test should right an error for an unreal track",
+			args: args{
+				"kjsjdkajskdjkasjkldkljadklasuid397r8fjdsfjsdkffsdfksdjfks",
+			},
+			want:    "",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
-		if got := SearchAndGetLyrics(tt.args.query); got != tt.want {
+		got, err := SearchAndGetLyrics(tt.args.query)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. SearchAndGetLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if got != tt.want {
 			t.Errorf("%q. SearchAndGetLyrics() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
@@ -233,21 +315,37 @@ func TestSearchAndGetLyricsByArtistAndName(t *testing.T) {
 		name   string
 	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name    string
+		args    args
+		want    string
+		wantErr bool
 	}{
 		{
-			name: "test should return right lyrics for a real track",
+			name: "test should return right lyrics for a real track by artist and name",
 			args: args{
 				"Sandra_Boynton",
 				"The_Shortest_Song_In_The_Universe",
 			},
-			want: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+			wantErr: false,
+		},
+		{
+			name: "test should return an error for an unreal track by artist and name",
+			args: args{
+				"sf.kjjkrjk4jk53k4mm34n,5j3",
+				"m43m5krdk.fgjkdjguijkgfkdgdf",
+			},
+			want:    "",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
-		if got := SearchAndGetLyricsByArtistAndName(tt.args.artist, tt.args.name); got != tt.want {
+		got, err := SearchAndGetLyricsByArtistAndName(tt.args.artist, tt.args.name)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. SearchAndGetLyricsByArtistAndName() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if got != tt.want {
 			t.Errorf("%q. SearchAndGetLyricsByArtistAndName() = %v, want %v", tt.name, got, tt.want)
 		}
 	}

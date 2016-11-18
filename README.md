@@ -23,23 +23,23 @@ import "github.com/mamal72/golyrics"
 
 func main() {
     // Get lyrics suggestions by searching
-    suggestions := golyrics.SearchLyrics("Blackfield Some Day") // []string
+    suggestions, err := golyrics.SearchLyrics("Blackfield Some Day") // []string, error
     // OR
-    suggestions := golyrics.SearchLyricsByArtistAndName("Blackfield", "Some Day") // []string
+    suggestions, err := golyrics.SearchLyricsByArtistAndName("Blackfield", "Some Day") // []string, error
 
     // Now fetch the lyrics
     if len(suggestions) == 0 {
         // No lyrics found for this track :(
         // Try some other keywords or show some error to user
     }
-    lyrics := golyrics.GetLyrics(suggestions[0]) // string
+    lyrics, err := golyrics.GetLyrics(suggestions[0]) // string, error
 
 
     // You can also search and fetch the lyrics with only one call
     // It'll use the first search result for fetching lyrics 
-    lyrics := golyrics.SearchAndGetLyrics("Blackfield Some Day") // string
+    lyrics, err := golyrics.SearchAndGetLyrics("Blackfield Some Day") // string, error
     // OR
-    lyrics := golyrics.SearchAndGetLyricsByArtistAndName("Blackfield", "Some Day") // string    
+    lyrics, err := golyrics.SearchAndGetLyricsByArtistAndName("Blackfield", "Some Day") // string, error
 }
 ```
 
