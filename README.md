@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/mamal72/golyrics.svg?branch=master)](https://travis-ci.org/mamal72/golyrics)
+
+
 # golyrics
 
 This is a simple scrapper package for fetching lyrics data from [Wikia](http://lyrics.wikia.com).
