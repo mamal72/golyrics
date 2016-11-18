@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/mamal72/golyrics.svg?branch=master)](https://travis-ci.org/mamal72/golyrics)
-
+[![GoDoc](https://godoc.org/github.com/mamal72/golyrics?status.svg)](https://godoc.org/github.com/mamal72/golyrics)
 
 # golyrics
 
