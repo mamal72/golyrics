@@ -289,7 +289,7 @@ func TestSearchAndGetLyrics(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test should right an error for an unreal track",
+			name: "test should return an error for an unreal track",
 			args: args{
 				"kjsjdkajskdjkasjkldkljadklasuid397r8fjdsfjsdkffsdfksdjfks",
 			},
