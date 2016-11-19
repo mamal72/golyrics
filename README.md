@@ -4,10 +4,10 @@
 
 # golyrics
 
-This is a simple scrapper package for fetching lyrics data from [Wikia](http://lyrics.wikia.com).
+This is a simple scrapper package to fetch lyrics data from the [Wikia](http://lyrics.wikia.com) website.
 
 
-## Installation:
+## Installation
 
 ```bash
 go get github.com/mamal72/golyrics
