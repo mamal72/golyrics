@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/mamal72/golyrics.svg?branch=master)](https://travis-ci.org/mamal72/golyrics)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mamal72/golyrics)](https://goreportcard.com/report/github.com/mamal72/golyrics)
 [![Coverage Status](https://coveralls.io/repos/github/mamal72/golyrics/badge.svg?branch=master)](https://coveralls.io/github/mamal72/golyrics?branch=master)
 [![GoDoc](https://godoc.org/github.com/mamal72/golyrics?status.svg)](https://godoc.org/github.com/mamal72/golyrics)
+[![license](https://img.shields.io/github/license/mamal72/golyrics.svg)](https://github.com/mamal72/golyrics/blob/master/LICENSE)
 
 # golyrics
 
