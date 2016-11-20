@@ -24,24 +24,26 @@ package main
 import "github.com/mamal72/golyrics"
 
 func main() {
-    // Get lyrics suggestions by searching
-    suggestions, err := golyrics.SearchLyrics("Blackfield Some Day") // []string, error
+    // Get track suggestions by searching
+    suggestions, err := golyrics.SearchTrack("Blackfield Some Day") // []Track, error
     // OR
-    suggestions, err := golyrics.SearchLyricsByArtistAndName("Blackfield", "Some Day") // []string, error
+    suggestions, err := golyrics.SearchTrackByArtistAndName("Blackfield", "Some Day") // []Track, error
 
-    // Now fetch the lyrics
-    if len(suggestions) == 0 {
+    // Let's check results
+    if err != nil || len(suggestions) == 0 {
         // No lyrics found for this track :(
         // Try some other keywords or show some error to user
     }
-    lyrics, err := golyrics.GetLyrics(suggestions[0]) // string, error
 
+    // Assign first result to the track
+    track := suggestions[0] // Track
 
-    // You can also search and fetch the lyrics with only one call
-    // It'll use the first search result for fetching lyrics 
-    lyrics, err := golyrics.SearchAndGetLyrics("Blackfield Some Day") // string, error
-    // OR
-    lyrics, err := golyrics.SearchAndGetLyricsByArtistAndName("Blackfield", "Some Day") // string, error
+    // Now fetch the lyrics and set it back on the track    
+    err := track.FetchLyrics() // error
+    if err != nil {
+        // Error fetching lyrics for the track
+    }
+    fmt.Printf("Lyrics of %s by %s: %s", track.Name, track.Artist, track.Lyrics)
 }
 ```
 

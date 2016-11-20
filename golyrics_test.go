@@ -141,14 +141,14 @@ func Test_getFormattedLyrics(t *testing.T) {
 	}
 }
 
-func TestSearchLyrics(t *testing.T) {
+func TestSearchTrack(t *testing.T) {
 	type args struct {
 		query string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    []string
+		want    []Track
 		wantErr bool
 	}{
 		{
@@ -156,10 +156,13 @@ func TestSearchLyrics(t *testing.T) {
 			args: args{
 				"metallica:unforgiven",
 			},
-			want: []string{
-				"Metallica:Unforgiven",
-				"Metallica:The Unforgiven II",
-			},
+			want: []Track{{
+				Artist: "Metallica",
+				Name:   "Unforgiven",
+			}, {
+				Artist: "Metallica",
+				Name:   "The Unforgiven II",
+			}},
 			wantErr: false,
 		},
 		{
@@ -167,12 +170,12 @@ func TestSearchLyrics(t *testing.T) {
 			args: args{
 				"sadasdasfdsfkdsjfgkrjferjkgnf,gfdngirjdgfmv",
 			},
-			want:    []string{},
+			want:    []Track{},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
-		got, err := SearchLyrics(tt.args.query)
+		got, err := SearchTrack(tt.args.query)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. SearchLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
@@ -183,7 +186,7 @@ func TestSearchLyrics(t *testing.T) {
 	}
 }
 
-func TestSearchLyricsByArtistAndName(t *testing.T) {
+func TestSearchTrackByArtistAndName(t *testing.T) {
 	type args struct {
 		artist string
 		name   string
@@ -191,7 +194,7 @@ func TestSearchLyricsByArtistAndName(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []string
+		want    []Track
 		wantErr bool
 	}{
 		{
@@ -200,9 +203,10 @@ func TestSearchLyricsByArtistAndName(t *testing.T) {
 				"blackfield",
 				"end of the world",
 			},
-			want: []string{
-				"Blackfield:End Of The World",
-			},
+			want: []Track{{
+				Artist: "Blackfield",
+				Name:   "End Of The World",
+			}},
 			wantErr: false,
 		},
 		{
@@ -211,130 +215,55 @@ func TestSearchLyricsByArtistAndName(t *testing.T) {
 				"sakfjweirufuxjn4hrfnmdxnjvdsfsdjhfhjsdfs",
 				"askjdjkasdjksdjlfjsdkufslidfjlksdjklfjklsdfjklsdfs",
 			},
-			want:    []string{},
+			want:    []Track{},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
-		got, err := SearchLyricsByArtistAndName(tt.args.artist, tt.args.name)
+		got, err := SearchTrackByArtistAndName(tt.args.artist, tt.args.name)
 		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. SearchLyricsByArtistAndName() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			t.Errorf("%q. SearchTrackByArtistAndName() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
 		}
 		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("%q. SearchLyricsByArtistAndName() = %v, want %v", tt.name, got, tt.want)
+			t.Errorf("%q. SearchTrackByArtistAndName() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestGetLyrics(t *testing.T) {
-	type args struct {
-		title string
+func TestTrack_FetchLyrics(t *testing.T) {
+	type fields struct {
+		Artist string
+		Name   string
+		Lyrics string
 	}
 	tests := []struct {
 		name    string
-		args    args
-		want    string
+		fields  fields
 		wantErr bool
 	}{
 		{
-			name: "test should return right lyrics for a real track",
-			args: args{
-				"Sandra_Boynton:The_Shortest_Song_In_The_Universe",
+			name: "should fetch lyrics for the track and sets it on it",
+			fields: fields{
+				Artist: "Sandra_Boynton",
+				Name:   "The_Shortest_Song_In_The_Universe",
+				Lyrics: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
 			},
-			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
-			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
-		got, err := GetLyrics(tt.args.title)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. GetLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
-			continue
-		}
-		if got != tt.want {
-			t.Errorf("%q. GetLyrics() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestSearchAndGetLyrics(t *testing.T) {
-	type args struct {
-		query string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
-		{
-			name: "test should search and return right lyrics for a real track",
-			args: args{
-				"Sandra_Boynton:The_Shortest_Song_In_The_Universe",
-			},
-			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
-			wantErr: false,
-		},
-		{
-			name: "test should return an error for an unreal track",
-			args: args{
-				"kjsjdkajskdjkasjkldkljadklasuid397r8fjdsfjsdkffsdfksdjfks",
-			},
-			want:    "",
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		got, err := SearchAndGetLyrics(tt.args.query)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. SearchAndGetLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
-			continue
-		}
-		if got != tt.want {
-			t.Errorf("%q. SearchAndGetLyrics() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestSearchAndGetLyricsByArtistAndName(t *testing.T) {
-	type args struct {
-		artist string
-		name   string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
-		{
-			name: "test should return right lyrics for a real track by artist and name",
-			args: args{
-				"Sandra_Boynton",
-				"The_Shortest_Song_In_The_Universe",
-			},
-			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
-			wantErr: false,
-		},
-		{
-			name: "test should return an error for an unreal track by artist and name",
-			args: args{
-				"sf.kjjkrjk4jk53k4mm34n,5j3",
-				"m43m5krdk.fgjkdjguijkgfkdgdf",
-			},
-			want:    "",
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		got, err := SearchAndGetLyricsByArtistAndName(tt.args.artist, tt.args.name)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. SearchAndGetLyricsByArtistAndName() error = %v, wantErr %v", tt.name, err, tt.wantErr)
-			continue
-		}
-		if got != tt.want {
-			t.Errorf("%q. SearchAndGetLyricsByArtistAndName() = %v, want %v", tt.name, got, tt.want)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			track := &Track{
+				Artist: tt.fields.Artist,
+				Name:   tt.fields.Name,
+				Lyrics: tt.fields.Lyrics,
+			}
+			if err := track.FetchLyrics(); (err != nil) != tt.wantErr {
+				t.Errorf("Track.FetchLyrics() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if track.Lyrics != tt.fields.Lyrics {
+				t.Errorf("%q. Track.FetchLyrics() = %v, want %v", tt.name, track.Lyrics, tt.fields.Lyrics)
+			}
+		})
 	}
 }

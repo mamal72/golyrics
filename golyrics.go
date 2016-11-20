@@ -1,7 +1,7 @@
 package golyrics
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -13,6 +13,30 @@ import (
 
 const searchBaseURI = "http://lyrics.wikia.com/index.php?action=ajax&rs=getLinkSuggest&format=json&query="
 const lyricsBaseURI = "http://lyrics.wikia.com/wiki/"
+
+// Track is a music track containing Artist, Name and Lyrics.
+type Track struct {
+	Artist string
+	Name   string
+	Lyrics string
+}
+
+// FetchLyrics fetches the lyrics of a Track and sets it on that track.
+func (track *Track) FetchLyrics() error {
+	URI := fmt.Sprintf("%s%s:%s", lyricsBaseURI, track.Artist, track.Name)
+	doc, err := goquery.NewDocument(URI)
+	if err != nil {
+		return err
+	}
+
+	lyricsHTML, err := doc.Find(".lyricbox").Html()
+	if err != nil {
+		return err
+	}
+
+	track.Lyrics = getFormattedLyrics(lyricsHTML)
+	return nil
+}
 
 func breakToNewLine(HTML string) string {
 	return strings.Replace(HTML, "<br/>", "\n", -1)
@@ -37,9 +61,9 @@ func getFormattedLyrics(text string) string {
 	return fixApostrophes(noHTMLTags)
 }
 
-// SearchLyrics searches for lyrics
-// using a string query that can be part of the track name or artist
-func SearchLyrics(query string) ([]string, error) {
+// SearchTrack searches for tracks
+// using a string query that can be part of the track name or artist.
+func SearchTrack(query string) ([]Track, error) {
 	requestURI := getSearchURI(query)
 	response, err := http.Get(requestURI)
 	if err != nil {
@@ -50,59 +74,25 @@ func SearchLyrics(query string) ([]string, error) {
 		return nil, err
 	}
 
-	suggestions := []string{}
+	suggestions := []Track{}
 	jsonparser.ArrayEach(data, func(value []byte, _ jsonparser.ValueType, offset int, _ error) {
-		suggestions = append(suggestions, string(value[:]))
+		title := string(value[:])
+		trackParts := strings.SplitN(title, ":", 2)
+		if len(trackParts) < 2 {
+			return
+		}
+		track := Track{
+			Artist: trackParts[0],
+			Name:   trackParts[1],
+		}
+		suggestions = append(suggestions, track)
 	}, "suggestions")
 
 	return suggestions, nil
 }
 
-// SearchLyricsByArtistAndName searches for lyrics
-// using artist and name of the track
-func SearchLyricsByArtistAndName(artist string, name string) ([]string, error) {
-	return SearchLyrics(artist + ":" + name)
-}
-
-// GetLyrics scrapes the lyrics of the given title
-// The title should be a search result response
-func GetLyrics(title string) (string, error) {
-	URI := lyricsBaseURI + title
-	doc, err := goquery.NewDocument(URI)
-	if err != nil {
-		return "", err
-	}
-
-	lyricsHTML, err := doc.Find(".lyricbox").Html()
-	if err != nil {
-		return "", err
-	}
-
-	return getFormattedLyrics(lyricsHTML), nil
-}
-
-// SearchAndGetLyrics searches for lyrics by a query
-// and returns the lyrics of the first search result
-func SearchAndGetLyrics(query string) (string, error) {
-	suggestions, err := SearchLyrics(query)
-	if err != nil {
-		return "", err
-	}
-	if len(suggestions) == 0 {
-		return "", errors.New("No lyrics found for " + query)
-	}
-	return GetLyrics(suggestions[0])
-}
-
-// SearchAndGetLyricsByArtistAndName searches for lyrics by artist and name
-// and returns the lyrics of the first search result
-func SearchAndGetLyricsByArtistAndName(artist string, name string) (string, error) {
-	suggestions, err := SearchLyrics(artist + ":" + name)
-	if err != nil {
-		return "", err
-	}
-	if len(suggestions) == 0 {
-		return "", errors.New("No lyrics found for " + artist + " - " + name)
-	}
-	return GetLyrics(suggestions[0])
+// SearchTrackByArtistAndName searches for tracks
+// using artist and name of the track.
+func SearchTrackByArtistAndName(artist string, name string) ([]Track, error) {
+	return SearchTrack(artist + ":" + name)
 }
