@@ -48,26 +48,20 @@ func Test_stripeHTMLTags(t *testing.T) {
 		HTML string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
+		name string
+		args args
+		want string
 	}{
 		{
 			name: "test should work for different kinds of HTML tags",
 			args: args{
 				"<p>Hello World<br/>This is a TEST! :D</p>",
 			},
-			want:    "Hello WorldThis is a TEST! :D",
-			wantErr: false,
+			want: "Hello WorldThis is a TEST! :D",
 		},
 	}
 	for _, tt := range tests {
-		got, err := stripeHTMLTags(tt.args.HTML)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. stripeHTMLTags() error = %v, wantErr %v", tt.name, err, tt.wantErr)
-			continue
-		}
+		got := stripeHTMLTags(tt.args.HTML)
 		if got != tt.want {
 			t.Errorf("%q. stripeHTMLTags() = %v, want %v", tt.name, got, tt.want)
 		}
@@ -127,26 +121,20 @@ func Test_getFormattedLyrics(t *testing.T) {
 		text string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
+		name string
+		args args
+		want string
 	}{
 		{
 			name: "test should return a correct formatted string from HTML lyrics",
 			args: args{
 				"<div class='lyricbox'>The shortest song in the universe<br/>Really isn't much fun<br/>It only has one puny verse<br/>. . . and then it's done!<div class='lyricsbreak'></div>\n</div>",
 			},
-			want:    "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
-			wantErr: false,
+			want: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
 		},
 	}
 	for _, tt := range tests {
-		got, err := getFormattedLyrics(tt.args.text)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%q. getFormattedLyrics() error = %v, wantErr %v", tt.name, err, tt.wantErr)
-			continue
-		}
+		got := getFormattedLyrics(tt.args.text)
 		if got != tt.want {
 			t.Errorf("%q. getFormattedLyrics() = %v, want %v", tt.name, got, tt.want)
 		}

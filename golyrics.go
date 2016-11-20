@@ -18,12 +18,9 @@ func breakToNewLine(HTML string) string {
 	return strings.Replace(HTML, "<br/>", "\n", -1)
 }
 
-func stripeHTMLTags(HTML string) (string, error) {
-	regex, err := regexp.Compile("<[^>]+>")
-	if err != nil {
-		return "", err
-	}
-	return regex.ReplaceAllString(HTML, ""), nil
+func stripeHTMLTags(HTML string) string {
+	regex, _ := regexp.Compile("<[^>]+>")
+	return regex.ReplaceAllString(HTML, "")
 }
 
 func fixApostrophes(text string) string {
@@ -34,13 +31,10 @@ func getSearchURI(query string) string {
 	return searchBaseURI + query
 }
 
-func getFormattedLyrics(text string) (string, error) {
+func getFormattedLyrics(text string) string {
 	noBreaks := breakToNewLine(text)
-	noHTMLTags, err := stripeHTMLTags(noBreaks)
-	if err != nil {
-		return "", err
-	}
-	return fixApostrophes(noHTMLTags), nil
+	noHTMLTags := stripeHTMLTags(noBreaks)
+	return fixApostrophes(noHTMLTags)
 }
 
 // SearchLyrics searches for lyrics
@@ -84,7 +78,7 @@ func GetLyrics(title string) (string, error) {
 		return "", err
 	}
 
-	return getFormattedLyrics(lyricsHTML)
+	return getFormattedLyrics(lyricsHTML), nil
 }
 
 // SearchAndGetLyrics searches for lyrics by a query
