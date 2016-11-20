@@ -3,8 +3,8 @@ language: go
 go:
   - go1.7
 
-script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic
+before_install:
+  - go get github.com/mattn/goveralls
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+script:
+  - goveralls -v -service travis-ci -repotoken $COVERALLS_TOKEN || go test -v

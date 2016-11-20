@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/mamal72/golyrics.svg?branch=master)](https://travis-ci.org/mamal72/golyrics)
-[![codecov](https://codecov.io/gh/mamal72/golyrics/branch/master/graph/badge.svg)](https://codecov.io/gh/mamal72/golyrics)
+[![Coverage Status](https://coveralls.io/repos/github/mamal72/golyrics/badge.svg?branch=master)](https://coveralls.io/github/mamal72/golyrics?branch=master)
 [![GoDoc](https://godoc.org/github.com/mamal72/golyrics?status.svg)](https://godoc.org/github.com/mamal72/golyrics)
 
 # golyrics
