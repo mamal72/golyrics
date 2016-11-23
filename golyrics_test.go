@@ -106,7 +106,7 @@ func Test_getSearchURI(t *testing.T) {
 			args: args{
 				"blackfield:pain",
 			},
-			want: "http://lyrics.wikia.com/index.php?action=ajax&rs=getLinkSuggest&format=json&query=blackfield:pain",
+			want: "http://lyrics.wikia.com/index.php?action=ajax&rs=getLinkSuggest&format=json&query=blackfield%3Apain",
 		},
 	}
 	for _, tt := range tests {
@@ -212,8 +212,8 @@ func TestSearchTrackByArtistAndName(t *testing.T) {
 		{
 			name: "test should return no results for unreal tracks",
 			args: args{
-				"sakfjweirufuxjn4hrfnmdxnjvdsfsdjhfhjsdfs",
-				"askjdjkasdjksdjlfjsdkufslidfjlksdjklfjklsdfjklsdfs",
+				"kjskjajkdjkaskjdjka",
+				"kjjasdkjakjdjkajk",
 			},
 			want:    []Track{},
 			wantErr: false,

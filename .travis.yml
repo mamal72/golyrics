@@ -2,6 +2,7 @@ language: go
 
 go:
   - go1.7
+  - tip
 
 before_install:
   - go get github.com/mattn/goveralls

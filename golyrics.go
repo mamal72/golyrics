@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -52,7 +53,7 @@ func fixApostrophes(text string) string {
 }
 
 func getSearchURI(query string) string {
-	return searchBaseURI + query
+	return fmt.Sprintf("%s%s", searchBaseURI, url.QueryEscape(query))
 }
 
 func getFormattedLyrics(text string) string {
