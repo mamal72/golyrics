@@ -48,8 +48,9 @@ func stripeHTMLTags(HTML string) string {
 	return regex.ReplaceAllString(HTML, "")
 }
 
-func fixApostrophes(text string) string {
-	return strings.Replace(text, "&#39;", "'", -1)
+func fixApostrophesAndQuotes(text string) string {
+	apostrophesFixed := strings.Replace(text, "&#39;", "'", -1)
+	return strings.Replace(apostrophesFixed, "&#34;", "\"", -1)
 }
 
 func getSearchURI(query string) string {
@@ -59,7 +60,7 @@ func getSearchURI(query string) string {
 func getFormattedLyrics(text string) string {
 	noBreaks := breakToNewLine(text)
 	noHTMLTags := stripeHTMLTags(noBreaks)
-	return fixApostrophes(noHTMLTags)
+	return fixApostrophesAndQuotes(noHTMLTags)
 }
 
 // SearchTrack searches for tracks

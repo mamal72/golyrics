@@ -68,7 +68,7 @@ func Test_stripeHTMLTags(t *testing.T) {
 	}
 }
 
-func Test_fixApostrophes(t *testing.T) {
+func Test_fixApostrophesAndQuotes(t *testing.T) {
 	type args struct {
 		text string
 	}
@@ -78,15 +78,15 @@ func Test_fixApostrophes(t *testing.T) {
 		want string
 	}{
 		{
-			name: "test should work for apostrophes in the strings",
+			name: "test should work for apostrophes and quotes in the strings",
 			args: args{
-				"I&#39;m not strong enough to stay away\nCan&#39;t run from you...",
+				"I&#39;m not strong enough to stay away\nCan&#39;t run from &#34;you&#34;...",
 			},
-			want: "I'm not strong enough to stay away\nCan't run from you...",
+			want: "I'm not strong enough to stay away\nCan't run from \"you\"...",
 		},
 	}
 	for _, tt := range tests {
-		if got := fixApostrophes(tt.args.text); got != tt.want {
+		if got := fixApostrophesAndQuotes(tt.args.text); got != tt.want {
 			t.Errorf("%q. fixApostrophes() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
