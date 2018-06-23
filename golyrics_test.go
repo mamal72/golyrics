@@ -247,7 +247,7 @@ func TestTrack_FetchLyrics(t *testing.T) {
 			fields: fields{
 				Artist: "Sandra_Boynton",
 				Name:   "The_Shortest_Song_In_The_Universe",
-				Lyrics: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n. . . and then it's done!\n",
+				Lyrics: "The shortest song in the universe\nReally isn't much fun\nIt only has one puny verse\n... And then it's done!\n",
 			},
 		},
 	}

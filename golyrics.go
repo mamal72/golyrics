@@ -44,7 +44,7 @@ func breakToNewLine(HTML string) string {
 }
 
 func stripeHTMLTags(HTML string) string {
-	regex, _ := regexp.Compile("<[^>]+>")
+	regex := regexp.MustCompile("<[^>]+>")
 	return regex.ReplaceAllString(HTML, "")
 }
 
@@ -78,7 +78,7 @@ func SearchTrack(query string) ([]Track, error) {
 
 	suggestions := []Track{}
 	jsonparser.ArrayEach(data, func(value []byte, _ jsonparser.ValueType, offset int, _ error) {
-		title := string(value[:])
+		title := string(value)
 		trackParts := strings.SplitN(title, ":", 2)
 		if len(trackParts) < 2 {
 			return
@@ -95,6 +95,6 @@ func SearchTrack(query string) ([]Track, error) {
 
 // SearchTrackByArtistAndName searches for tracks
 // using artist and name of the track.
-func SearchTrackByArtistAndName(artist string, name string) ([]Track, error) {
+func SearchTrackByArtistAndName(artist, name string) ([]Track, error) {
 	return SearchTrack(artist + ":" + name)
 }
